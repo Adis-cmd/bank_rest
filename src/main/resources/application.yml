@@ -6,8 +6,8 @@ spring:
     name: Bank Cards
 
 jwt:
-  secret: BankCardsKey_a8f3j2k9m5n7p1q4r6s2t0u2v4w6x12y5
-  lifetime: 30m
+  secret: ${JWT_SECRET}
+  lifetime: ${JWT_LIFETIME}
 
   datasource:
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
