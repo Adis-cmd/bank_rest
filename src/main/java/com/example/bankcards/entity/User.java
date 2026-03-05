@@ -2,6 +2,7 @@ package com.example.bankcards.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ public class User {
     String password;
 
     @Column(name = "enabled")
+    @ColumnDefault("true")
     Boolean enabled;
 
     @ManyToOne(fetch = FetchType.LAZY)
