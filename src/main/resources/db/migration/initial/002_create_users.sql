@@ -10,7 +10,7 @@ CREATE TABLE users (
     email          VARCHAR(255) UNIQUE NOT NULL,
     password       VARCHAR(255) NOT NULL,
     enabled        BOOLEAN NOT NULL DEFAULT TRUE,
-    authorities_id INTEGER,
+    authorities_id BIGINT,
 
     CONSTRAINT fk_user_authorities
         FOREIGN KEY (authorities_id)

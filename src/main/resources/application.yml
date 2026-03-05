@@ -5,10 +5,6 @@ spring:
   application:
     name: Bank Cards
 
-jwt:
-  secret: ${JWT_SECRET}
-  lifetime: ${JWT_LIFETIME}
-
   datasource:
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
     username: ${DB_USERNAME}
@@ -29,3 +25,7 @@ jwt:
 
 server:
   port: 9999
+
+jwt:
+  secret: ${JWT_SECRET}
+  lifetime: ${JWT_LIFETIME}
