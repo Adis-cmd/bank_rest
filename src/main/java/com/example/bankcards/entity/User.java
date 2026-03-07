@@ -35,7 +35,7 @@ public class User {
     @ColumnDefault("true")
     Boolean enabled;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "authorities_id", referencedColumnName = "id")
     Authority authority;
 

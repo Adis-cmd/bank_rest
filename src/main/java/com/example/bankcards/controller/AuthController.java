@@ -30,6 +30,13 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtils jwtTokenUtils;
 
+
+    /**
+     * Регистрирует нового пользователя в системе.
+     *
+     * @param dto данные для регистрации
+     * @return 201 если пользователь создан
+     */
     @PostMapping("/register")
     @Operation(summary = "Регистрация нового пользователя", description = "Создает нового пользователя в системе")
     @ApiResponses(value = {
@@ -43,7 +50,12 @@ public class AuthController {
     }
 
 
-
+    /**
+     * Выполняет вход в систему и возвращает JWT токен.
+     *
+     * @param dto данные для входа (email, пароль)
+     * @return JWT токен
+     */
     @PostMapping("/login")
     @Operation(summary = "Вход в систему", description = "Возвращает JWT токен")
     @ApiResponses(value = {
