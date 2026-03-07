@@ -3,6 +3,7 @@ package com.example.bankcards.service.impl;
 import com.example.bankcards.dto.AuthRegisterDto;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.exception.EmailAlreadyExistsException;
+import com.example.bankcards.exception.UserNotFoundException;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.service.AuthorityService;
 import com.example.bankcards.service.UserService;
@@ -35,6 +36,21 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         repository.save(user);
+    }
+
+
+
+    @Override
+    public User findById(Long userId) {
+        return repository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found!!!"));
+    }
+
+
+    @Override
+    public User findUserByEmail(String email) {
+        return repository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found!!!"));
     }
 
 }
