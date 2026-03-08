@@ -1,1 +1,935 @@
-# Здесь будет OpenAPI описание всех доступных эндпоинтов и моделей данных.
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Bank Card Management API",
+    "description": "REST API для управления банковскими картами",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8099",
+      "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "Bearer Token": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Admin Controller",
+      "description": "Административные операции (управление пользователями, картами и транзакциями)"
+    },
+    {
+      "name": "Cards Controller",
+      "description": "Общие операции с картами (доступны пользователям и администраторам)"
+    },
+    {
+      "name": "Authentication",
+      "description": "API для аутентификации и регистрации пользователей"
+    },
+    {
+      "name": "Transaction Controller",
+      "description": "API для управления транзакциями и операциями с картами"
+    }
+  ],
+  "paths": {
+    "/api/cards/{cardId}/block-request": {
+      "put": {
+        "tags": [
+          "Cards Controller"
+        ],
+        "summary": "Запрос блокировки карты",
+        "description": "Пользователь запрашивает блокировку своей карты",
+        "operationId": "blockRequestCard",
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Запрос на блокировку отправлен",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Карта не найдена",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Карта не принадлежит пользователю",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/cards/{cardId}/block": {
+      "put": {
+        "tags": [
+          "Admin Controller"
+        ],
+        "summary": "Блокировка карты",
+        "description": "Блокирует карту пользователя",
+        "operationId": "blockCard",
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Карта успешно заблокирована",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Карта не найдена",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/cards/{cardId}/activate": {
+      "put": {
+        "tags": [
+          "Admin Controller"
+        ],
+        "summary": "Активация карты",
+        "description": "Активирует карту пользователя",
+        "operationId": "activateCard",
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Карта успешно активирована",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Карта не найдена",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/transaction": {
+      "post": {
+        "tags": [
+          "Transaction Controller"
+        ],
+        "summary": "Перевод между картами",
+        "description": "Выполняет перевод средств между своими картами",
+        "operationId": "transfer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Перевод выполнен"
+          },
+          "400": {
+            "description": "Неверные данные или недостаточно средств"
+          },
+          "404": {
+            "description": "Карта не найдена"
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Регистрация нового пользователя",
+        "description": "Создает нового пользователя в системе",
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRegisterDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Пользователь успешно зарегистрирован"
+          },
+          "400": {
+            "description": "Неверные данные"
+          },
+          "409": {
+            "description": "Пользователь уже существует"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Вход в систему",
+        "description": "Возвращает JWT токен",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthLoginDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный вход",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Неверные данные",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/cards": {
+      "get": {
+        "tags": [
+          "Admin Controller"
+        ],
+        "operationId": "cards",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseAdminCardResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Admin Controller"
+        ],
+        "summary": "Создание карты",
+        "description": "Создаёт новую карту для пользователя",
+        "operationId": "createCard",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CardCreateDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Карта успешно создана"
+          },
+          "404": {
+            "description": "Пользователь не найден"
+          },
+          "400": {
+            "description": "Неверные данные"
+          }
+        }
+      }
+    },
+    "/api/cards": {
+      "get": {
+        "tags": [
+          "Cards Controller"
+        ],
+        "summary": "Получение карт пользователя",
+        "description": "Возвращает карты текущего пользователя с пагинацией и фильтрацией по статусу",
+        "operationId": "cards_1",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Список карт получен",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseCardDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный статус карты",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseCardDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cards/{cardId}/balance": {
+      "get": {
+        "tags": [
+          "Cards Controller"
+        ],
+        "summary": "Получение баланса карты",
+        "operationId": "balance",
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Баланс получен",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Карта не найдена",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Карта не принадлежит пользователю",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users": {
+      "get": {
+        "tags": [
+          "Admin Controller"
+        ],
+        "operationId": "users",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseUserDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{userId}/cards": {
+      "get": {
+        "tags": [
+          "Admin Controller"
+        ],
+        "operationId": "cardUserId",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseAdminCardResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{userId}": {
+      "delete": {
+        "tags": [
+          "Admin Controller"
+        ],
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/cards/{cardId}": {
+      "delete": {
+        "tags": [
+          "Admin Controller"
+        ],
+        "summary": "Удаление карты",
+        "description": "Удаляет карту по ID (только для администратора)",
+        "operationId": "deleteCard",
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Карта успешно удалена",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Карта не найдена",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Нельзя удалить активную карту",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TransferDto": {
+        "type": "object",
+        "description": "DTO для перевода между картами",
+        "properties": {
+          "fromCard": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ID карты списания",
+            "example": 1
+          },
+          "toCard": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ID карты получателя",
+            "example": 2
+          },
+          "amount": {
+            "type": "number",
+            "description": "Сумма перевода",
+            "example": 500
+          }
+        },
+        "required": [
+          "amount",
+          "fromCard",
+          "toCard"
+        ]
+      },
+      "AuthRegisterDto": {
+        "type": "object",
+        "description": "DTO для регистрации/создания пользователя",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Имя пользователя",
+            "example": "Сергей",
+            "minLength": 1
+          },
+          "surname": {
+            "type": "string",
+            "description": "Фамилия пользователя",
+            "example": "Петров",
+            "minLength": 1
+          },
+          "email": {
+            "type": "string",
+            "description": "Email пользователя",
+            "example": "petrov@gmail.com",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "description": "Пароль пользователя",
+            "example": "yourPassword",
+            "minLength": 1
+          }
+        }
+      },
+      "AuthLoginDto": {
+        "type": "object",
+        "description": "DTO для входа в систему",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email пользователя",
+            "example": "petrov@gmail.com",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "description": "Пароль пользователя",
+            "example": "yourPassword",
+            "minLength": 1
+          }
+        }
+      },
+      "AuthResponseDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "CardCreateDto": {
+        "type": "object",
+        "description": "DTO для создания карты",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ID пользователя",
+            "example": 1
+          }
+        },
+        "required": [
+          "userId"
+        ]
+      },
+      "CardDto": {
+        "type": "object",
+        "description": "DTO карты для отображения пользователю",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ID карты",
+            "example": 1
+          },
+          "maskedCardNumber": {
+            "type": "string",
+            "description": "Маскированный номер карты",
+            "example": "**** **** **** 1234"
+          },
+          "status": {
+            "type": "string",
+            "description": "Статус карты",
+            "enum": [
+              "ACTIVE",
+              "BLOCKED",
+              "EXPIRED",
+              "BLOCK_REQUESTED"
+            ],
+            "example": "ACTIVE"
+          },
+          "balance": {
+            "type": "number",
+            "description": "Баланс карты",
+            "example": 1000
+          },
+          "expirationDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Срок действия",
+            "example": "2027-12-31"
+          }
+        }
+      },
+      "PageResponseCardDto": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CardDto"
+            }
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PageResponseUserDto": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserDto"
+            }
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "UserDto": {
+        "type": "object",
+        "description": "DTO пользователя",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ID пользователя",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Имя пользователя",
+            "example": "Ivan"
+          },
+          "surname": {
+            "type": "string",
+            "description": "Фамилия пользователя",
+            "example": "Ivanov"
+          }
+        }
+      },
+      "AdminCardResponse": {
+        "type": "object",
+        "description": "Ответ с данными карты для администратора",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Имя владельца карты",
+            "example": "Ivan"
+          },
+          "surname": {
+            "type": "string",
+            "description": "Фамилия владельца карты",
+            "example": "Ivanov"
+          },
+          "maskedCardNumber": {
+            "type": "string",
+            "description": "Маскированный номер карты",
+            "example": "**** **** **** 1234"
+          },
+          "status": {
+            "type": "string",
+            "description": "Статус карты",
+            "enum": [
+              "ACTIVE",
+              "BLOCKED",
+              "EXPIRED",
+              "BLOCK_REQUESTED"
+            ],
+            "example": "ACTIVE"
+          },
+          "balance": {
+            "type": "number",
+            "description": "Баланс карты",
+            "example": 1000
+          },
+          "expirationDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Срок действия карты",
+            "example": "2027-12-31"
+          }
+        }
+      },
+      "PageResponseAdminCardResponse": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminCardResponse"
+            }
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer Token": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
