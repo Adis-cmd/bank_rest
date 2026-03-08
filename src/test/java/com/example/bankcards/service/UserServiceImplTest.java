@@ -1,6 +1,7 @@
 package com.example.bankcards.service;
 
 import com.example.bankcards.dto.AuthRegisterDto;
+import com.example.bankcards.dto.UserDto;
 import com.example.bankcards.entity.Authority;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.exception.EmailAlreadyExistsException;
@@ -12,8 +13,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -112,5 +118,45 @@ class UserServiceImplTest {
 
         assertThrows(UserNotFoundException.class,
                 () -> userService.findUserByEmail("notfound@gmail.com"));
+    }
+
+    @Test
+    void deleteUser_success() {
+        User user = User.builder()
+                .id(1L)
+                .email("qwerty@gmail.com")
+                .build();
+
+        when(repository.findById(1L)).thenReturn(Optional.of(user));
+
+        userService.deleteUser(1L);
+
+        verify(repository, times(1)).delete(user);
+    }
+
+    @Test
+    void deleteUser_notFound_throwsException() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> userService.deleteUser(99L));
+    }
+
+    @Test
+    void getAllUser_success() {
+        User user = User.builder()
+                .id(1L)
+                .name("Тест")
+                .surname("Тестов")
+                .email("qwerty@gmail.com")
+                .build();
+
+        Page<User> page = new PageImpl<>(List.of(user));
+        when(repository.findAll(any(Pageable.class))).thenReturn(page);
+
+        Page<UserDto> result = userService.getAllUser(PageRequest.of(0, 10));
+
+        assertEquals(1, result.getTotalElements());
+        assertEquals("Тест", result.getContent().get(0).getName());
+        verify(repository, times(1)).findAll(any(Pageable.class));
     }
 }
