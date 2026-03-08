@@ -7,6 +7,8 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "cards")
@@ -37,4 +39,10 @@ public class Card {
 
     @Column(name = "balance", nullable = false, precision = 15, scale = 2)
     private BigDecimal balance = BigDecimal.ZERO;
+
+    @OneToMany(mappedBy = "fromCard")
+    private List<Transaction> fromTransactions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "toCard")
+    private List<Transaction> toTransactions = new ArrayList<>();
 }
