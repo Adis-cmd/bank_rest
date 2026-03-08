@@ -24,6 +24,15 @@ import java.security.Principal;
 public class CardController {
     private final CardService cardService;
 
+    /**
+     * Возвращает карты текущего пользователя с пагинацией и фильтрацией по статусу.
+     *
+     * @param principal данные текущего авторизованного пользователя
+     * @param status    статус карты для фильтрации (опционально)
+     * @param page      номер страницы (по умолчанию 0)
+     * @param size      размер страницы (по умолчанию 10)
+     * @return страница с картами пользователя
+     */
     @GetMapping
     @Operation(summary = "Получение карт пользователя", description = "Возвращает карты текущего пользователя с пагинацией и фильтрацией по статусу")
     @ApiResponses(value = {
@@ -41,6 +50,9 @@ public class CardController {
 
         PageResponse<CardDto> response = PageResponse.<CardDto>builder()
                 .content(cards.getContent())
+                .totalElements(cards.getTotalElements())
+                .totalPages(cards.getTotalPages())
+                .pageNumber(cards.getNumber())
                 .build();
 
         return ResponseEntity.ok(response);

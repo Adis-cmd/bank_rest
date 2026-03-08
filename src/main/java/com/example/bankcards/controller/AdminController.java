@@ -1,13 +1,17 @@
 package com.example.bankcards.controller;
 
-import com.example.bankcards.dto.CardCreateDto;
+import com.example.bankcards.dto.*;
 import com.example.bankcards.service.CardService;
+import com.example.bankcards.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +22,97 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AdminController {
     private final CardService cardService;
+    private final UserService userService;
+
+    /**
+     * Возвращает список всех карт в системе с пагинацией и фильтрацией по статусу.
+     *
+     * @param status статус карты для фильтрации (опционально)
+     * @param page   номер страницы (по умолчанию 0)
+     * @param size   размер страницы (по умолчанию 10)
+     * @return страница с картами всех пользователей
+     */
+    @GetMapping("cards")
+    public ResponseEntity<PageResponse<AdminCardResponse>> cards(
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<AdminCardResponse> cards = cardService.getAllCards(status, pageable);
+
+        PageResponse<AdminCardResponse> response = PageResponse.<AdminCardResponse>builder()
+                .content(cards.getContent())
+                .totalElements(cards.getTotalElements())
+                .totalPages(cards.getTotalPages())
+                .pageNumber(cards.getNumber())
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Возвращает список всех пользователей с пагинацией.
+     *
+     * @param page номер страницы (по умолчанию 0)
+     * @param size размер страницы (по умолчанию 10)
+     * @return страница с пользователями
+     */
+    @GetMapping("/users")
+    public ResponseEntity<PageResponse<UserDto>> users(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<UserDto> users = userService.getAllUser(pageable);
+
+        PageResponse<UserDto> response = PageResponse.<UserDto>builder()
+                .content(users.getContent())
+                .totalElements(users.getTotalElements())
+                .totalPages(users.getTotalPages())
+                .pageNumber(users.getNumber())
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Удаляет пользователя по ID.
+     *
+     * @param userId ID пользователя
+     * @return 200 если пользователь удалён
+     */
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
+        userService.deleteUser(userId);
+        return ResponseEntity.ok("Пользователь успешно удалён");
+    }
+
+    /**
+     * Возвращает список карт конкретного пользователя с пагинацией.
+     *
+     * @param userId ID пользователя
+     * @param page   номер страницы (по умолчанию 0)
+     * @param size   размер страницы (по умолчанию 10)
+     * @return страница с картами пользователя
+     */
+    @GetMapping("/users/{userId}/cards")
+    public ResponseEntity<PageResponse<AdminCardResponse>> cardUserId(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<AdminCardResponse> cards = cardService.getCardsByUserId(userId, pageable);
+
+        PageResponse<AdminCardResponse> response = PageResponse.<AdminCardResponse>builder()
+                .content(cards.getContent())
+                .totalElements(cards.getTotalElements())
+                .totalPages(cards.getTotalPages())
+                .pageNumber(cards.getNumber())
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
 
     /**
      * Создаёт новую карту для указанного пользователя.
@@ -37,7 +132,6 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-
     /**
      * Блокирует карту пользователя.
      *
@@ -54,7 +148,6 @@ public class AdminController {
         cardService.blockCard(cardId);
         return ResponseEntity.ok("Карта успешно заблокирована");
     }
-
 
     /**
      * Активирует карту пользователя.
