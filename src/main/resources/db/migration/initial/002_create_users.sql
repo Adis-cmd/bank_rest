@@ -15,6 +15,6 @@ CREATE TABLE users (
     CONSTRAINT fk_user_authorities
         FOREIGN KEY (authorities_id)
         REFERENCES authorities (id)
-        ON DELETE RESTRICT
+        ON DELETE CASCADE
         ON UPDATE CASCADE
 );

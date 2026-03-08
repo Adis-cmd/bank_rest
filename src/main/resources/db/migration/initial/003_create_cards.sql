@@ -15,6 +15,6 @@ CREATE TABLE cards (
     CONSTRAINT fk_card_owner
         FOREIGN KEY (owner_id)
         REFERENCES users (id)
-        ON DELETE RESTRICT
+        ON DELETE CASCADE
         ON UPDATE CASCADE
 );
