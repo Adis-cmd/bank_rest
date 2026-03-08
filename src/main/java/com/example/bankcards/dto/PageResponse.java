@@ -13,4 +13,5 @@ public class PageResponse<T> {
     private List<T> content;
     private long totalElements;
     private int totalPages;
+    private int pageNumber;
 }
