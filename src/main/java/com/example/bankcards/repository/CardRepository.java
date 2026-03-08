@@ -19,4 +19,8 @@ public interface CardRepository extends JpaRepository<Card, Long> {
 
     @Query("select c from Card c where c.owner.id = :userId and c.status = :status")
     Page<Card> findByOwnerIdAndStatus(@Param("userId") Long userId, @Param("status") CardStatus status, Pageable pageable);
+
+    @Query("select c from Card c where c.status = :status")
+    Page<Card> findByStatus(@Param("status") CardStatus status, Pageable pageable);
+
 }
