@@ -53,6 +53,16 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.FORBIDDEN, e.getMessage());
     }
 
+    @ExceptionHandler(SameCardTransferException.class)
+    public ResponseEntity<ErrorResponse> handleSameCardTransfer(SameCardTransferException e) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(TransferLimitExceededException.class)
+    public ResponseEntity<ErrorResponse> handleTransferLimitExceededException(TransferLimitExceededException e) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException e) {
         String message = e.getBindingResult().getFieldErrors()
